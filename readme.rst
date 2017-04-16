@@ -1,127 +1,82 @@
-|Build Status|
-
-Miracle
-=======
-
-Miracle is an ACL for Python that was designed to be well-structuted,
-simple yet exhaustive. It uses *permissions* defined on *resources*, and
-*roles* are granted with the access to them.
-
-To be a universal tool, it does not include any special cases, does not
-force you to persist and does not insist on any formats or conventions.
-
-Maximum flexibility and total control. Enjoy! :)
-
-Highlights:
-
--  Inspired by `miracle <https://github.com/kolypto/nodejs-miracle/>`__
-   for NodeJS ;
--  Simple core
--  No restrictions on authorization entities
--  Unit-tested
-
-Table of Contents
-=================
-
--  Define The Structure
-
-   -  Acl
-   -  Create
-
-      -  add\_role(role)
-      -  add\_roles(roles)
-      -  add\_resource(resource)
-      -  add\_permission(resource, permission)
-      -  add(structure)
-
-   -  Remove
-
-      -  remove\_role(role)
-      -  remove\_resource(resource)
-      -  remove\_permission(resource, permission)
-      -  clear()
-
-   -  Get
-
-      -  get\_roles()
-      -  get\_resources()
-      -  get\_permissions(resource)
-      -  get()
-
-   -  Export and Import
-
--  Authorize
-
-   -  Grant Permissions
-
-      -  grant(role, resource, permission)
-      -  grants(grants)
-      -  revoke(role, resource, permission)
-      -  revoke\_all(role[, resource])
-
-   -  Check Permissions
-
-      -  check(role, resource, permission)
-      -  check\_any(roles, resource, permission)
-      -  check\_all(roles, resource, permission)
-
-   -  Show Grants
-
-      -  which\_permissions(role, resource)
-      -  which\_permissions\_any(roles, resource)
-      -  which\_permissions\_all(roles, resource)
-      -  which(role)
-      -  which\_any(roles)
-      -  which\_all(roles)
-      -  show()
-
-Define The Structure
-====================
-
-Acl
+Rbas
 ---
 
-To start using miracle, instantiate the ``Acl`` object:
+To start using RBAS, instantiate the ``RBAS`` object:
 
 .. code:: python
 
-    from acl import Acl
-    acl = Acl()
+    from rbas import RBAS
+    rbs = RBAS()
 
-The ``Acl`` object keeps track of your *resources* and *permissions*
+The ``RBAS`` object keeps track of your *resources* and *permissions*
 defined on them, handles *grants* over *roles* and provides utilities to
-manage them. When configured, you can check the access against the
-defined state.
+manage them.
 
-Create
+Methods
 ------
 
-Methods from this section allow you to build the *structure*: list of
-roles, resources and permissions.
-
-It's not required that you have the structure defined before you start
-granting the access: the ``grant()`` method implicitly creates all
-resources and permissions that were not previously defined.
-
-Start with defining the *resources* and *permissions* on them, then you
-can grant a *role* with the access to some permissions on a resource.
-
-For roles, resources & permissions, any hashable objects will do.
-
-``add_role(role)``
+``add_role(user, role)``
 ~~~~~~~~~~~~~~~~~~
 
 Define a role.
 
--  ``role``: the role to define.
+-  ``user``: User which is to be assigned the role.
 
-The role will have no permissions granted, but will appear in
-``get_roles()``.
+-  ``role``: Role to be defined for the user
 
 .. code:: python
 
-    acl.add_role('admin')
-    acl.get_roles()  # -> {'admin'}
+    >>> rbs.add_role('user1', 'r1')
+
+``create_user(user, roles)``
+~~~~~~~~~~~~~~~~~~
+
+Creates a user.
+
+-  ``user``: User which is to be created.
+
+-  ``roles``: Roles to be associated with the user.
+
+.. code:: python
+
+    >>> rbs.create_user('user1')
+    >>> rbs.create_user('user2', 'r1')
+    >>> rbs.create_user('user3', ['r2', 'r1'])
+
+``get_all_users()``
+~~~~~~~~~~~~~~~~~~
+
+Returns a set of all the users.
+
+.. code:: python
+
+    >>> rbs.get_all_users()
+    {'user2', 'user3', 'user1'}
+
+``get_role_user(user)``
+~~~~~~~~~~~~~~~~~~
+
+Returns all roles assigned to the user.
+
+-  ``user``: User whose roles are to be returned.
+
+.. code:: python
+
+    >>> rbs.get_role_user('user3')
+    {'r1', 'r2'}
+
+``get_user_role(role)``
+~~~~~~~~~~~~~~~~~~
+
+Returns all users assigned to the role.
+
+-  ``role``: Role of which users assigned are to be returned
+
+.. code:: python
+
+    >>> rbs.get_user_role('r1')
+    {'user2', 'user3'}
+
 
 ``add_roles(roles)``
 ~~~~~~~~~~~~~~~~~~~~
