@@ -12,35 +12,35 @@ class RBAS(object):
         # Set of tuple objects
         self.grant = set()
 
-    def add_role(self, _user, role):
+    def add_role(self, user, role):
         """
         Add a role
 
-        :param _user: User which is to be assigned the role
-        :type _user: str
+        :param user: User which is to be assigned the role
+        :type user: str
         :param role: Role to be defined for the user
         :type role: str
         """
-        self.users[_user].add(role)
+        self.users[user].add(role)
         if role not in self.roles:
             self.roles[role] = set()
-        self.roles[role].add(_user)
+        self.roles[role].add(user)
 
-    def create_user(self, _user, roles=None):
+    def create_user(self, user, roles=None):
         """
         Creating a user.
 
-        :param _user: User which is to be created
-        :type _user: str
+        :param user: User which is to be created
+        :type user: str
         :param role: Role to be associated with the user
         :type role: str ot list
         """
-        self.users[_user] = set()
+        self.users[user] = set()
         if roles:
             if isinstance(roles, str):
                 roles = [roles]
             for role in roles:
-                self.add_role(_user, role)
+                self.add_role(user, role)
 
     def get_all_users(self):
         """
@@ -50,55 +50,55 @@ class RBAS(object):
         """
         return set(self.users.keys())
 
-    def get_role_user(self, _user):
+    def get_role_user(self, user):
         """
         Returns all roles assigned to a user
 
-        :param _user: user whose roles are to be returned
-        :type _user: str
+        :param user: user whose roles are to be returned
+        :type user: str
         :rtype: set()
         """
-        return self.users[_user]
+        return self.users[user]
 
-    def get_user_role(self, _role):
+    def get_user_role(self, role):
         """
         Returns all users assigned the role
 
-        :param _role: Role of which users assigned are to be returned
-        :type _role: str
+        :param role: Role of which users assigned are to be returned
+        :type role: str
         :rtype: set()
         """
-        return self.roles[_role]
+        return self.roles[role]
 
-    def del_role_from_user(self, _user, _role):
+    def del_role_from_user(self, user, role):
         """
         Remove the user from the role
 
-        :param _user: User which has to be disassociated with the role
-        :type _user: str
-        :param _role: Role that has to be removed from the user
-        :type _role: str
+        :param user: User which has to be disassociated with the role
+        :type user: str
+        :param role: Role that has to be removed from the user
+        :type role: str
         """
-        self.users[_user].discard(_role)
-        self.roles[_role].discard(_user)
-        if self.roles[_role] == set():
-            del self.roles[_role]
-            self.grant = set([tup for tup in self.grant if tup[0] != _role])
+        self.users[user].discard(role)
+        self.roles[role].discard(user)
+        if self.roles[role] == set():
+            del self.roles[role]
+            self.grant = set([tup for tup in self.grant if tup[0] != role])
 
-    def del_user(self, _user):
+    def del_user(self, user):
         """
         Remove the user and its associated roles
 
-        :param _user: user to be deleted
-        :type _user: str
+        :param user: user to be deleted
+        :type user: str
         """
-        if _user in self.users:
-            for role in self.users[_user]:
-                self.roles[role].discard(_user)
+        if user in self.users:
+            for role in self.users[user]:
+                self.roles[role].discard(user)
                 if self.roles[role] == set():
                     del self.roles[role]
                     self.grant = set([tup for tup in self.grant if tup[0] != role])
-            del self.users[_user]
+            del self.users[user]
 
     def grant_action(self, role, resource, action):
         """
@@ -203,8 +203,6 @@ class RBAS(object):
     def add(self, user, obj):
         """
         Adding actions to resources with roles defined for user
-
-        {user: [role, {resource, action}]}
 
         :param obj: Nested dictionary containing all the information
         :type obj: dict
