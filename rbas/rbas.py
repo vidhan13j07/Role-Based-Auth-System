@@ -159,8 +159,7 @@ class RBAS(object):
         :type action: str
         """
         self.resources[_resource].discard(action)
-        self.grant = set([tup for tup in self.grant if tup[1] != _resource and tup[2] != action])
-
+        self.grant = set([d for d in self.grant if d['resource'] != _resource and d['action'] != action])
 
     def del_resource(self, _resource):
         """
@@ -170,7 +169,7 @@ class RBAS(object):
         :type _resource: str
         """
         del self.resources[_resource]
-        self.grant = set([tup for tup in self.grant if tup[1] != _resource])
+        self.grant = set([tup for tup in self.grant if tup['resource'] != _resource])
 
     def grant_action(self, role, resource, action):
         """
@@ -183,4 +182,9 @@ class RBAS(object):
         :param action: Action that is permitted to be performed
         :type action: str
         """
-        self.grant.add((role, resource, action))
+        d = {
+            'role': role,
+            'resource': resource,
+            'action': action
+        }
+        self.grant.add(d)
