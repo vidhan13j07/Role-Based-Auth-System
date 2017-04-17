@@ -120,7 +120,7 @@ Define an action of a role on the resource
 ``get_all_grants()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Return all the grants
+Return a *set* of all the grants
 
 .. code:: python
 
@@ -243,7 +243,6 @@ Adding actions to resources with roles defined for user
 .. code:: python
 
     >>> rbs = rbas.RBAS()
-
     >>> l = [
             {
                 'name': 'r1',
@@ -260,5 +259,5 @@ Adding actions to resources with roles defined for user
                     }
             }
         ]
+    >>> rbs.add('user1', l)
 
-	>>> rbs.add('user1', l)
