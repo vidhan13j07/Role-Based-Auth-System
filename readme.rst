@@ -1,5 +1,5 @@
 Rbas
----
+-------------------------------------------------------------------
 
 To start using RBAS, instantiate the ``RBAS`` object:
 
@@ -13,10 +13,10 @@ defined on them, handles *grants* over *roles* and provides utilities to
 manage them.
 
 Methods
-------
+-------------------------------------------------------------------
 
 ``add_role(user, role)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Define a role.
 
@@ -26,10 +26,10 @@ Define a role.
 
 .. code:: python
 
-    >>> rbs.add_role('user1', 'r1')
+    >>> rbs.add_role('user1', 'role1')
 
 ``create_user(user, roles)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates a user.
 
@@ -40,11 +40,11 @@ Creates a user.
 .. code:: python
 
     >>> rbs.create_user('user1')
-    >>> rbs.create_user('user2', 'r1')
-    >>> rbs.create_user('user3', ['r2', 'r1'])
+    >>> rbs.create_user('user2', 'role1')
+    >>> rbs.create_user('user3', ['role2', 'role1'])
 
 ``get_all_users()``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns a set of all the users.
 
@@ -54,7 +54,7 @@ Returns a set of all the users.
     {'user2', 'user3', 'user1'}
 
 ``get_role_user(user)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns all roles assigned to the user.
 
@@ -63,10 +63,10 @@ Returns all roles assigned to the user.
 .. code:: python
 
     >>> rbs.get_role_user('user3')
-    {'r1', 'r2'}
+    {'role1', 'role2'}
 
 ``get_user_role(role)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns all users assigned to the role.
 
@@ -74,344 +74,189 @@ Returns all users assigned to the role.
 
 .. code:: python
 
-    >>> rbs.get_user_role('r1')
+    >>> rbs.get_user_role('role1')
     {'user2', 'user3'}
 
+``del_role_from_user(self, user, role)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``add_roles(roles)``
-~~~~~~~~~~~~~~~~~~~~
+Remove the user from the role.
 
-Define multiple roles
+-  ``user``: User which has to be disassociated with the role.
 
--  ``roles``: An iterable of roles
+-  ``role``: Role that has to be removed from the user.
 
-.. code:: python
+  .. code:: python
 
-    acl.add_roles(['admin', 'root'])
-    acl.get_roles()  # -> {'admin', 'root'}
+    >>> rbs.del_role_from_user('user3', 'role1')
 
-``add_resource(resource)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+``del_user(self, user)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Define a resource.
+Remove the user and its associated roles
 
--  ``resources``: the resource to define.
+-  ``user``: User which has to be deleted.
 
-The resource will have no permissions defined but will appear in
-``get_resources()``.
+  .. code:: python
 
-.. code:: python
+    >>> rbs.del_user('user1')
 
-    acl.add_resource('blog')
-    acl.get_resources()  # -> {'blog'}
+``grant_action(role, resource, action)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``add_permission(resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Define a permission on a resource.
-
--  ``resource``: the resource to define the permission on. Is created if
-   was not previously defined.
--  ``permission``: the permission to define.
-
-The defined permission is not granted to anyone, but will appear in
-``get_permissions(resource)``.
-
-.. code:: python
-
-    acl.add_permission('blog', 'post')
-    acl.get_permissions('blog')  # -> {'post'}
-
-``add(structure)``
-~~~~~~~~~~~~~~~~~~
-
-Define the whole resource/permission structure with a single dict.
-
--  ``structure``: a dict that maps resources to an iterable of
-   permissions.
-
-.. code:: python
-
-    acl.add({
-        'blog': ['post'],
-        'page': {'create', 'read', 'update', 'delete'},
-    })
-
-Remove
-------
-
-``remove_role(role)``
-~~~~~~~~~~~~~~~~~~~~~
-
-Remove the role and its grants.
-
--  ``role``: the role to remove.
-
-.. code:: python
-
-    acl.remove_role('admin')
-
-``remove_resource(resource)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Remove the resource along with its grants and permissions.
-
--  ``resource``: the resource to remove.
-
-.. code:: python
-
-    acl.remove_resource('blog')
-
-``remove_permission(resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Remove the permission from a resource.
-
--  ``resource``: the resource to remove the permission from.
--  ``permission``: the permission to remove.
-
-The resource is not implicitly removed: it remains with an empty set of
-permissions.
-
-.. code:: python
-
-    acl.remove_permission('blog', 'post')
-
-``clear()``
-~~~~~~~~~~~
-
-Remove all roles, resources, permissions and grants.
-
-Get
----
-
-``get_roles()``
-~~~~~~~~~~~~~~~
-
-Get the set of defined roles.
-
-.. code:: python
-
-    acl.get_roles()  # -> {'admin', 'anonymous', 'registered'}
-
-``get_resources()``
-~~~~~~~~~~~~~~~~~~~
-
-Get the set of defined resources, including those with empty permissions
-set.
-
-.. code:: python
-
-    acl.get_resources()  # -> {'blog', 'page', 'article'}
-
-``get_permissions(resource)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Get the set of permissions for a resource.
-
--  ``resource``: the resource to get the permissions for.
-
-.. code:: python
-
-    acl.get_permissions('page')  # -> {'create', 'read', 'update', 'delete'}
-
-``get()``
-~~~~~~~~~
-
-Get the *structure*: hash of all resources mapped to their permissions.
-
-Returns a dict: ``{ resource: set(permission,...), ... }``.
-
-.. code:: python
-
-    acl.get()  # -> { blog: {'post'}, page: {'create', ...} }
-
-Export and Import
------------------
-
-The ``Acl`` class is picklable:
-
-.. code:: python
-
-    acl = miracle.Acl()
-    save = acl.__getstate__()
-
-    #...
-
-    acl = miracle.Acl()
-    acl.__setstate__(save)
-
-Authorize
-=========
-
-Grant Permissions
------------------
-
-``grant(role, resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Grant a permission over resource to the specified role.
+Define an action of a role on the resource
 
 -  ``role``: The role to grant the access to
+
 -  ``resource``: The resource to grant the access over
--  ``permission``: The permission to grant with
 
-Roles, resources and permissions are implicitly created if missing.
-
-.. code:: python
-
-    acl.grant('admin', 'blog', 'delete')
-    acl.grant('anonymous', 'page', 'view')
-
-``grants(grants)``
-~~~~~~~~~~~~~~~~~~
-
-Add a structure of grants to the Acl.
-
--  ``grants``: A hash in the following form:
-   ``{ role: { resource: set(permission) } }``.
+-  ``action``: The action to grant with
 
 .. code:: python
 
-    acl.grants({
-        'admin': {
-            'blog': ['post'],
-        },
-        'anonymous': {
-            'page': ['view']
-        }
-    })
+    >>> rbs.grant('role1', 'rs1', 'delete')
+    >>> rbs.grant('role2', 'rs2', 'read')
 
-``revoke(role, resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``get_all_grants()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Revoke a permission over a resource from the specified role.
+Return all the grants
 
 .. code:: python
 
-    acl.revoke('anonymous', 'page', 'view')
-    acl.revoke('user', 'account', 'delete')
+    >>> rbs.get_all_grants()
+    {('role1', 'rs1', 'delete'), ('role2', 'rs2', 'read')}
 
-``revoke_all(role[, resource])``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``remove_grant(role, resource, action)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Revoke all permissions from the specified role for all resources. If the
-optional ``resource`` argument is provided - removes all permissions
-from the specified resource.
+Remove an action of a role on the resource
+
+-  ``role``: Role of which can perform action is to be removed from resource
+
+-  ``resource``: Resource on which action is to be removed
+
+-  ``action``: Action that is to be removed
 
 .. code:: python
 
-    acl.revoke_all('anonymous', 'page')  # revoke all permissions from a single resource
-    acl.revoke_all('anonymous')  # revoke permissions from all resources
+    >>> rbs.remove_grant('role1', 'rs1', 'delete')
+    >>> rbs.get_all_grants()
+    {('role2', 'rs2', 'read')}
 
-Check Permissions
------------------
+``remove_resource(resource)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``check(role, resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Remove the resource from the grant.
 
-Test whether the given role has access to the resource with the
-specified permission.
+-  ``resource``: Resource to be deleted
+
+.. code:: python
+
+    >>> rbs.remove_resource('role2')
+    >>> rbs.get_all_grants()
+    {}
+
+``remove_action_resource(resource, action)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remove the resource and action from the grant.
+
+-  ``resource``: Resource to be deleted.
+
+-  ``action``: Action to be deleted.
+
+.. code:: python
+
+    >>> rbs.grant_action('role1', 'rs2', 'read')
+    >>> rbs.remove__action_resource('rs2', 'read')
+    >>> rbs.get_all_grants()
+    {}
+
+``remove_all(role, resource=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remove the grants given to a role.
+
+-  ``role``: Role of which actions on resources are to be removed
+
+-  ``resource``: Resource on which is to be removed.
+
+.. code:: python
+
+    >>> rbs.grant_action('role1', 'rs2', 'read')
+    >>> rbs.grant_action('role1', 'rs1', 'write')
+    >>> rbs.remove_all('role1')
+    >>> rbs.get_all_grants()
+    {}
+
+
+``check_role(role, resource, action)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tests whether the given role has access to an action for a resource
 
 -  ``role``: The role to check
+
 -  ``resource``: The protected resource
--  ``permission``: The required permission
+
+-  ``action``: The required action
 
 Returns a boolean.
 
 .. code:: python
 
-    acl.check('admin', 'blog') # True
-    acl.check('anonymous', 'page', 'delete') # -> False
+    >>> rbs.check_role('role1', 'rs1', 'read')
+    True
+    >>> rbs.check_role('role1', 'rs1', 'delete')
+    False
 
-``check_any(roles, resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``check_user(user, resource, action)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Test whether *any* of the given roles have access to the resource with
-the specified permission.
+Tests whether the given role has access to an action for a resource
 
--  ``roles``: An iterable of roles.
+-  ``user``: The user to check
 
-When no roles are provided, returns False.
+-  ``resource``: The protected resource
 
-``check_all(roles, resource, permission)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-  ``action``: The required action
 
-Test whether *all* of the given roles have access to the resource with
-the specified permission.
-
--  ``roles``: An iterable of roles.
-
-When no roles are provided, returns False.
-
-Show Grants
------------
-
-which\_permissions(role, resource)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-List permissions that the provided role has over the resource:
+Returns a boolean.
 
 .. code:: python
 
-    acl.which_permissions('admin', 'blog')  # -> {'post'}
+    >>> rbs.check_role('user1', 'r1', 'read')
+    True
+    >>> rbs.check_role('user1', 'r1', 'delete')
+    False
 
-which\_permissions\_any(roles, resource)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``add(user, obj)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-List permissions that any of the provided roles have over the resource:
+Adding actions to resources with roles defined for user
 
-.. code:: python
+-  ``user``: The user which is being added.
 
-    acl.which_permissions_any(['anonymous', 'registered'], 'page')  # -> {'view'}
-
-which\_permissions\_all(roles, resource)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-List permissions that all of the provided roles have over the resource:
+-  ``obj``: Nested dictionary containing all the information
 
 .. code:: python
 
-    acl.which_permissions_all(['anonymous', 'registered'], 'page')  # -> {'view'}
-
-``which(role)``
-~~~~~~~~~~~~~~~
-
-Collect grants that the provided role has:
-
-.. code:: python
-
-    acl.which('admin')  # -> { blog: {'post'} }
-
-``which_any(roles)``
-~~~~~~~~~~~~~~~~~~~~
-
-Collect grants that any of the provided roles have (union).
-
-.. code:: python
-
-    acl.which(['anonymous', 'registered'])  # -> { page: ['view'] }
-
-``which_all(roles)``
-~~~~~~~~~~~~~~~~~~~~
-
-Collect grants that all of the provided roles have (intersection):
-
-.. code:: python
-
-    acl.which(['anonymous', 'registered'])  # -> { page: ['view'] }
-
-``show()``
-~~~~~~~~~~
-
-Get all current grants.
-
-Returns a dict ``{ role: { resource: set(permission) } }``.
-
-.. code:: python
-
-    acl.show()  # -> { admin: { blog: ['post'] } }
-
-.. |Build Status| image:: https://travis-ci.org/kolypto/py-miracle.png?branch=master
-   :target: https://travis-ci.org/kolypto/py-miracle
-
+    >>> rbs = rbas.RBAS()
+    >>> l = [
+            {
+                'name': 'r1',
+                'resources': {
+                        'rs1': ['read', 'delete'],
+                        'rs2': ['write']
+                    }
+            },
+            {
+                'name': 'r2',
+                'resources': {
+                        'rs2': ['delete'],
+                        'rs3': ['read']
+                    }
+            }
+        ]
+	>>> rbs.add('user1', l)
