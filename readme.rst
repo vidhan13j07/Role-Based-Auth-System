@@ -1,4 +1,4 @@
-Rbas
+RBAS
 -------------------------------------------------------------------
 
 To start using RBAS, instantiate the ``RBAS`` object:
@@ -8,7 +8,7 @@ To start using RBAS, instantiate the ``RBAS`` object:
     from rbas import RBAS
     rbs = RBAS()
 
-The ``RBAS`` object keeps track of your *resources* and *permissions*
+The ``RBAS`` object keeps track of your *resources* and *actions*
 defined on them, handles *grants* over *roles* and provides utilities to
 manage them.
 
@@ -46,7 +46,7 @@ Creates a user.
 ``get_all_users()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns a set of all the users.
+Returns a *set* of all the users.
 
 .. code:: python
 
@@ -56,7 +56,7 @@ Returns a set of all the users.
 ``get_role_user(user)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns all roles assigned to the user.
+Returns a *set* of roles assigned to the user.
 
 -  ``user``: User whose roles are to be returned.
 
@@ -68,7 +68,7 @@ Returns all roles assigned to the user.
 ``get_user_role(role)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns all users assigned to the role.
+Returns a *set* of users assigned to the role.
 
 -  ``role``: Role of which users assigned are to be returned
 
@@ -77,7 +77,7 @@ Returns all users assigned to the role.
     >>> rbs.get_user_role('role1')
     {'user2', 'user3'}
 
-``del_role_from_user(self, user, role)``
+``del_role_from_user(user, role)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remove the user from the role.
@@ -90,7 +90,7 @@ Remove the user from the role.
 
     >>> rbs.del_role_from_user('user3', 'role1')
 
-``del_user(self, user)``
+``del_user(user)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remove the user and its associated roles
@@ -132,7 +132,7 @@ Return all the grants
 
 Remove an action of a role on the resource
 
--  ``role``: Role of which can perform action is to be removed from resource
+-  ``role``: Role of which action is to be removed from resource
 
 -  ``resource``: Resource on which action is to be removed
 
@@ -153,7 +153,7 @@ Remove the resource from the grant.
 
 .. code:: python
 
-    >>> rbs.remove_resource('role2')
+    >>> rbs.remove_resource('rs2')
     >>> rbs.get_all_grants()
     {}
 
@@ -180,7 +180,7 @@ Remove the grants given to a role.
 
 -  ``role``: Role of which actions on resources are to be removed
 
--  ``resource``: Resource on which is to be removed.
+-  ``resource``: Resource on which action is to be removed.
 
 .. code:: python
 
@@ -202,7 +202,7 @@ Tests whether the given role has access to an action for a resource
 
 -  ``action``: The required action
 
-Returns a boolean.
+Returns a *boolean*.
 
 .. code:: python
 
@@ -222,7 +222,7 @@ Tests whether the given role has access to an action for a resource
 
 -  ``action``: The required action
 
-Returns a boolean.
+Returns a *boolean*.
 
 .. code:: python
 
@@ -243,6 +243,7 @@ Adding actions to resources with roles defined for user
 .. code:: python
 
     >>> rbs = rbas.RBAS()
+
     >>> l = [
             {
                 'name': 'r1',
@@ -259,4 +260,5 @@ Adding actions to resources with roles defined for user
                     }
             }
         ]
+
 	>>> rbs.add('user1', l)
