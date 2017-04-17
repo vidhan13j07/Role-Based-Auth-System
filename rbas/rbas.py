@@ -3,13 +3,13 @@ from collections import defaultdict
 class RBAS(object):
 
     def __init__(self):
-        # Users alongwith thier roles: { user: set(roles) }
+        """
+        :self.users: Users alongwith thier roles: { user: set(roles) }
+        :self.roles: Roles alongwith the users: { role: set(users) }
+        :self.grant: Set of tuple objects: (role, resource, action)
+        """
         self.users = defaultdict(set)
-
-        # Roles alongwith the users: { role: set(users) }
         self.roles = defaultdict(set)
-
-        # Set of tuple objects
         self.grant = set()
 
     def add_role(self, user, role):
