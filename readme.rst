@@ -226,9 +226,9 @@ Returns a *boolean*.
 
 .. code:: python
 
-    >>> rbs.check_role('user1', 'r1', 'read')
+    >>> rbs.check_user('user1', 'r1', 'read')
     True
-    >>> rbs.check_role('user1', 'r1', 'delete')
+    >>> rbs.check_user('user1', 'r1', 'delete')
     False
 
 ``add(user, obj)``
